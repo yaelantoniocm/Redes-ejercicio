@@ -1,31 +1,23 @@
 from flask import Flask, jsonify, request
-from utils import suma_peticion
-from getmac import get_mac_address as gma
+import primo
 import psutil
+
+rango = [0]*2
+arreglo = []
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
-def recibe():
-    return jsonify({"valor": 0})
-
-@app.route('/suma', methods=['POST'])
+@app.route('/calcular', methods=['POST'])
 def suma():
+    rango = list(request.json.get("rango"))
     return jsonify({
-                    "valor": suma_peticion(request),
-                    "mac": str(gma()),
-                    "name": "Yael"
-                   })
+                "arreglo": list(primo.calcular_primos(rango[0], rango[1])),
+                "rango": str(rango)
+            })
 
-@app.route('/ram', methods=['POST'])
-def obtener_ram():
-    return jsonify({"ram": psutil.virtual_memory().total})
-
-@app.route('/finalizado', methods=['POST'])
-def finalizar():
-    name = request.json.get("name")
-    print(str("Algoritmo finalizado por " + name))
-    return str("Algoritmo finalizado por " + name)
+@app.route('/cpu', methods=['POST'])
+def obtener_cpu():
+    return jsonify({"cpu": psutil.cpu_count()})
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True)
+    app.run(host='localhost', debug=True) 
